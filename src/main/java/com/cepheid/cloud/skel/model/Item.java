@@ -13,35 +13,58 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "ITEM")
+@Table(name = "item")
 public class Item extends AbstractEntity {
-	
-    @Column(name = "Name")
-    private String mName;
-    
-    @Column(name = "State")
-    @Enumerated(EnumType.STRING)
-    private ItemState mState;
-    
-    public Item() {
-    	this.mState = ItemState.UNDEFINED;
-//    	this.mDescriptions = new ArrayList<Description>();
-    }
-    
-    public String getName() {
-        return this.mName;
-    }
-    
-    public void setName(String name) {
-        this.mName = name;
-        
-        if (name.length() > 0)
-        	this.mState = ItemState.VALID;
-        else
-        	this.mState = ItemState.INVALID;
-    }
-    
-    public ItemState getState() {
-    	return this.mState;
-    }
+
+	@Column(name = "Name")
+	private String mName;
+
+	@Column(name = "State")
+	@Enumerated(EnumType.STRING)
+	private ItemState mState;
+
+	@OneToMany(mappedBy = "mItem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private List<Description> mDescriptions;
+
+	public Item() {
+		super();
+		mState = ItemState.UNDEFINED;
+		mDescriptions = new ArrayList<Description>();
+	}
+
+	public String getName() {
+		return mName;
+	}
+
+	public void setName(String name) {
+		mName = name;
+
+		if (name.length() > 0)
+			mState = ItemState.VALID;
+		else
+			mState = ItemState.INVALID;
+	}
+
+	public ItemState getState() {
+		return mState;
+	}
+
+	public void setState(ItemState state) {
+		mState = state;
+	}
+
+	public List<Description> getDescriptions() {
+		if (mDescriptions == null)
+			mDescriptions = new ArrayList<Description>();
+		return mDescriptions;
+	}
+
+	public void addDescription(Description description) {
+		this.getDescriptions().add(description);
+		description.setItem(this);
+	}
+
+	public void setDescriptions(List<Description> descriptions) {
+		mDescriptions = descriptions;
+	}
 }
