@@ -36,7 +36,7 @@ public class ItemController {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
   public Collection<Item> getItems() {
-    return null;
+    return mItemRepository.findAll();
   }
  
   
