@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,11 +67,8 @@ public class ItemController {
 	@Path("/item")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getItem(@QueryParam("name") String name) throws ResourceNotFoundException {
-		// Create the example item with the name match the given query name.
-		Item e_item = new Item();
-		e_item.setName(name);
-		Example<Item> e_item_example = Example.of(e_item);
-		Collection<Item> found_items = mItemRepository.findAll(e_item_example);
+		Collection<Item> found_items = mItemRepository.findAllBymName(name)
+				.orElseThrow(() -> new ResourceNotFoundException("Item was not found with name: " + name));
 		// Return the find Item information, with HTTP status code OK.
 		return Response.status(Status.OK).entity(found_items).build();
 	}

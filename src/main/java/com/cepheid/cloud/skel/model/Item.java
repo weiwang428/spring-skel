@@ -23,7 +23,7 @@ public class Item extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	private ItemState mState;
 
-	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@Column(name = "Descriptions")
 	private List<Description> mDescriptions;
 
@@ -59,6 +59,7 @@ public class Item extends AbstractEntity {
 	}
 
 	public void setDescriptions(List<Description> descriptions) {
+		getDescriptions().clear();
 		descriptions.forEach(d -> addDescription(d));
 	}
 
