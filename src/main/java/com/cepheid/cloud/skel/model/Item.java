@@ -63,4 +63,14 @@ public class Item extends AbstractEntity {
 	public void setDescriptions(List<Description> descriptions) {
 		mDescriptions = descriptions;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(super.toString());
+		sb.append("Name : ").append(getName()).append("\n");
+		sb.append("--------Descriptions-------").append("\n");
+		getDescriptions().forEach(d -> sb.append(d));
+		sb.append("---------------------------").append("\n");
+		return sb.toString();
+	}
 }

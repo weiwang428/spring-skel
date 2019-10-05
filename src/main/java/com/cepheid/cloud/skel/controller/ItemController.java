@@ -48,7 +48,6 @@ public class ItemController {
 		Collection<Item> found_items = mItemRepository.findAll();
 		found_items.forEach(System.out::println);
 		return Response.status(Status.OK).entity(found_items).build();
-//		return Response.status(Status.OK).build();
 	}
 
 	@GET

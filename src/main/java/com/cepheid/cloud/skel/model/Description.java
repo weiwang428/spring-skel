@@ -43,4 +43,10 @@ public class Description extends AbstractEntity {
 		this.item = item;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(super.toString());
+		sb.append("Content : ").append(getContent()).append("\n");
+		return sb.toString();
+	}
 }
