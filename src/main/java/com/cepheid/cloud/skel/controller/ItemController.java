@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cepheid.cloud.skel.exception.ResourceNotFoundException;
 import com.cepheid.cloud.skel.model.Item;
+import com.cepheid.cloud.skel.repository.DescriptionRepository;
 import com.cepheid.cloud.skel.repository.ItemRepository;
 
 import io.swagger.annotations.Api;
@@ -35,10 +36,12 @@ import io.swagger.annotations.Api;
 public class ItemController {
 
 	private final ItemRepository mItemRepository;
+	private final DescriptionRepository mDescriptionRepository;
 
 	@Autowired
-	public ItemController(ItemRepository itemRepository) {
+	public ItemController(ItemRepository itemRepository, DescriptionRepository descriptionRepository) {
 		mItemRepository = itemRepository;
+		mDescriptionRepository = descriptionRepository;
 	}
 
 	@GET
@@ -46,7 +49,8 @@ public class ItemController {
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Response getItems() {
 		Collection<Item> found_items = mItemRepository.findAll();
-		found_items.forEach(System.out::println);
+//		found_items.forEach(System.out::println);
+		mDescriptionRepository.findAll().forEach(System.out::println);
 		return Response.status(Status.OK).entity(found_items).build();
 	}
 
@@ -77,7 +81,16 @@ public class ItemController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addItem(Item item) {
-		Item m_item = mItemRepository.save(item);
+//		Item m_item = mItemRepository.save(item);
+		System.out.print(item);
+		Item new_item = new Item();
+		new_item.setName(item.getName());
+		new_item.setState(item.getState());
+		item.getDescriptions().forEach(d -> new_item.addDescription(d));
+//		mItemRepository.save(item);
+//		mDescriptionRepository.saveAll(item.getDescriptions());
+		Item m_item = mItemRepository.save(new_item);
+		mDescriptionRepository.findAll().forEach(System.out::println);
 		// Return the new added Item information, with HTTP status code Created.
 		return Response.status(Status.CREATED).entity(m_item).build();
 	}
