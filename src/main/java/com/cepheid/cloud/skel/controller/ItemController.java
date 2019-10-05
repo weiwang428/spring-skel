@@ -50,7 +50,7 @@ public class ItemController {
 	public Response getItems() {
 		Collection<Item> found_items = mItemRepository.findAll();
 //		found_items.forEach(System.out::println);
-		mDescriptionRepository.findAll().forEach(System.out::println);
+//		mDescriptionRepository.findAll().forEach(System.out::println);
 		return Response.status(Status.OK).entity(found_items).build();
 	}
 
@@ -81,16 +81,8 @@ public class ItemController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addItem(Item item) {
-//		Item m_item = mItemRepository.save(item);
-		System.out.print(item);
-		Item new_item = new Item();
-		new_item.setName(item.getName());
-		new_item.setState(item.getState());
-		item.getDescriptions().forEach(d -> new_item.addDescription(d));
-//		mItemRepository.save(item);
-//		mDescriptionRepository.saveAll(item.getDescriptions());
-		Item m_item = mItemRepository.save(new_item);
-		mDescriptionRepository.findAll().forEach(System.out::println);
+		Item m_item = mItemRepository.save(item);
+//		mDescriptionRepository.findAll().forEach(System.out::println);
 		// Return the new added Item information, with HTTP status code Created.
 		return Response.status(Status.CREATED).entity(m_item).build();
 	}
@@ -106,7 +98,7 @@ public class ItemController {
 		m_item.setName(item.getName());
 		m_item.setState(item.getState());
 		m_item.setDescriptions(item.getDescriptions());
-		mItemRepository.save(m_item);
+		m_item = mItemRepository.save(m_item);
 		// Return the update Item information, with HTTP status code Accepted.
 		return Response.status(Status.ACCEPTED).entity(m_item).build();
 	}

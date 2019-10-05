@@ -50,8 +50,6 @@ public class Item extends AbstractEntity {
 	}
 
 	public List<Description> getDescriptions() {
-		if (mDescriptions == null)
-			mDescriptions = new ArrayList<Description>();
 		return mDescriptions;
 	}
 
@@ -61,7 +59,7 @@ public class Item extends AbstractEntity {
 	}
 
 	public void setDescriptions(List<Description> descriptions) {
-		mDescriptions = descriptions;
+		descriptions.forEach(d -> addDescription(d));
 	}
 
 	@Override
