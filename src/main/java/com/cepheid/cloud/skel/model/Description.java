@@ -16,7 +16,8 @@ public class Description extends AbstractEntity {
 	@Column(name = "Content")
 	private String mContent;
 
-	// For some reason, mItem naming will cause Json to fail.
+	// For some reason, mItem naming will cause @JsonIgnore to fail and leads to a
+	// loop reference.
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "Item_Id")
 	@JsonIgnore

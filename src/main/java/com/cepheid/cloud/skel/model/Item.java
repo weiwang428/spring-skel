@@ -1,7 +1,7 @@
 package com.cepheid.cloud.skel.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -24,12 +24,13 @@ public class Item extends AbstractEntity {
 	private ItemState mState;
 
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<Description> mDescriptions;
+	@Column(name = "Descriptions")
+	private List<Description> mDescriptions;
 
 	public Item() {
 		super();
 		mState = ItemState.UNDEFINED;
-		mDescriptions = new HashSet<Description>();
+		mDescriptions = new ArrayList<Description>();
 	}
 
 	public String getName() {
@@ -48,9 +49,9 @@ public class Item extends AbstractEntity {
 		mState = state;
 	}
 
-	public Set<Description> getDescriptions() {
+	public List<Description> getDescriptions() {
 		if (mDescriptions == null)
-			mDescriptions = new HashSet<Description>();
+			mDescriptions = new ArrayList<Description>();
 		return mDescriptions;
 	}
 
@@ -59,7 +60,7 @@ public class Item extends AbstractEntity {
 		description.setItem(this);
 	}
 
-	public void setDescriptions(Set<Description> descriptions) {
+	public void setDescriptions(List<Description> descriptions) {
 		mDescriptions = descriptions;
 	}
 }
