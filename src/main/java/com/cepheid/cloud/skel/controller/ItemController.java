@@ -27,7 +27,14 @@ import com.cepheid.cloud.skel.repository.ItemRepository;
 
 import io.swagger.annotations.Api;
 
-// curl http:/localhost:9443/app/api/1.0/items
+/***
+ * This is a ItemController class which provides the REST API to the user to a
+ * one-to-many item->description CRUD operation. To List all the items, a query
+ * can be done like this: {@code curl http:/localhost:9443/app/api/1.0/items}
+ * 
+ * @author Wei Wang
+ * @version 1.0
+ */
 
 @Component
 @Path("/api/1.0/items")
@@ -37,12 +44,26 @@ public class ItemController {
 	private final ItemRepository mItemRepository;
 	private final DescriptionRepository mDescriptionRepository;
 
+	/**
+	 * Constructor for class ItemController with provided services.
+	 * 
+	 * @param itemRepository        ItemRepository object to manipulate the item
+	 *                              objects.
+	 * @param descriptionRepository DescriptionRepository object to manipulate the
+	 *                              description objects.
+	 */
 	@Autowired
 	public ItemController(ItemRepository itemRepository, DescriptionRepository descriptionRepository) {
 		mItemRepository = itemRepository;
 		mDescriptionRepository = descriptionRepository;
 	}
 
+	/**
+	 * Get a collection of all the Item objects from the database server, the given
+	 * format will be in application/json.
+	 * 
+	 * @return A collection of all the item objects from the database.
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
@@ -53,6 +74,14 @@ public class ItemController {
 		return Response.status(Status.OK).entity(found_items).build();
 	}
 
+	/**
+	 * Get a specific Item object with a given item id from the database server, the
+	 * given format will be in application/json, it will generate an
+	 * ResourceNotFoundException if there is no item with the given id.
+	 * 
+	 * @return A item object from the database with the given item id.
+	 * @exception ResourceNotFoundException
+	 */
 	@GET
 	@Path("/item/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -63,6 +92,15 @@ public class ItemController {
 		return Response.status(Status.OK).entity(item).build();
 	}
 
+	/**
+	 * Get a collection of Item objects with a given item name from the database
+	 * server, the given format will be in application/json, it will generate an
+	 * ResourceNotFoundException if there is no item with the given name.
+	 * 
+	 * @return A collection of item objects from the database with the given item
+	 *         name.
+	 * @exception ResourceNotFoundException
+	 */
 	@GET
 	@Path("/item")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -73,6 +111,14 @@ public class ItemController {
 		return Response.status(Status.OK).entity(found_items).build();
 	}
 
+	/**
+	 * Add a new Item objects to the database server, return the new added item
+	 * information, the given format will be in application/json. If the given item
+	 * has a ID which is already exist in the database, it will update the exiting
+	 * item instead.
+	 * 
+	 * @return The new added item object information from database.
+	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -83,6 +129,14 @@ public class ItemController {
 		return Response.status(Status.CREATED).entity(m_item).build();
 	}
 
+	/**
+	 * Update an existing Item object in the database server, return the updated
+	 * item information, the given format will be in application/json, it will
+	 * generate an ResourceNotFoundException if there is no item with the given id.
+	 * 
+	 * @return The updated item object information from database.
+	 * @exception ResourceNotFoundException
+	 */
 	@PUT
 	@Path("/item/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -99,6 +153,15 @@ public class ItemController {
 		return Response.status(Status.ACCEPTED).entity(m_item).build();
 	}
 
+	/**
+	 * Delete an existing Item object from the database server, return the HTTP
+	 * status 202 which shows the delete operation is OK, it will generate an
+	 * ResourceNotFoundException if there is no item with the given id.
+	 * 
+	 * @return HTTP status Status.ACCEPTED(code: 202), and a message shows the
+	 *         deletion is successful.
+	 * @exception ResourceNotFoundException
+	 */
 	@DELETE
 	@Path("/item/{id}")
 	public Response deleteItem(@PathParam("id") Long id) throws ResourceNotFoundException {

@@ -6,6 +6,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+/*** This is a abstract entity class which has a ID for database entity.
+* @author Wei Wang
+* @version 1.0
+*/
+
 @MappedSuperclass
 public abstract class AbstractEntity {
 
@@ -14,10 +19,17 @@ public abstract class AbstractEntity {
 	@Column(name = "Id")
 	protected Long mId;
 
+	/**
+	 * @return ID of the entity.
+	 */
 	public Long getId() {
 		return mId;
 	}
 
+	/**
+	 * 
+	 * @param id Entity ID to be set.
+	 */
 	public void setId(Long id) {
 		mId = id;
 	}
