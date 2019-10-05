@@ -1,7 +1,7 @@
 package com.cepheid.cloud.skel.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -23,13 +23,13 @@ public class Item extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	private ItemState mState;
 
-	@OneToMany(mappedBy = "mItem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<Description> mDescriptions;
+	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<Description> mDescriptions;
 
 	public Item() {
 		super();
 		mState = ItemState.UNDEFINED;
-		mDescriptions = new ArrayList<Description>();
+		mDescriptions = new HashSet<Description>();
 	}
 
 	public String getName() {
@@ -38,11 +38,6 @@ public class Item extends AbstractEntity {
 
 	public void setName(String name) {
 		mName = name;
-
-		if (name.length() > 0)
-			mState = ItemState.VALID;
-		else
-			mState = ItemState.INVALID;
 	}
 
 	public ItemState getState() {
@@ -53,9 +48,9 @@ public class Item extends AbstractEntity {
 		mState = state;
 	}
 
-	public List<Description> getDescriptions() {
+	public Set<Description> getDescriptions() {
 		if (mDescriptions == null)
-			mDescriptions = new ArrayList<Description>();
+			mDescriptions = new HashSet<Description>();
 		return mDescriptions;
 	}
 
@@ -64,7 +59,7 @@ public class Item extends AbstractEntity {
 		description.setItem(this);
 	}
 
-	public void setDescriptions(List<Description> descriptions) {
+	public void setDescriptions(Set<Description> descriptions) {
 		mDescriptions = descriptions;
 	}
 }

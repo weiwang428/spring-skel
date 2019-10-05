@@ -7,6 +7,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "description")
 public class Description extends AbstractEntity {
@@ -14,9 +16,11 @@ public class Description extends AbstractEntity {
 	@Column(name = "Content")
 	private String mContent;
 
+	// For some reason, mItem naming will cause Json to fail.
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "Item_Id")
-	private Item mItem;
+	@JsonIgnore
+	private Item item;
 
 	public Description() {
 		super();
@@ -31,11 +35,11 @@ public class Description extends AbstractEntity {
 	}
 
 	public Item getItem() {
-		return mItem;
+		return item;
 	}
 
 	public void setItem(Item item) {
-		mItem = item;
+		this.item = item;
 	}
 
 }
