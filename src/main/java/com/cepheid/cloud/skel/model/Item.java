@@ -134,7 +134,7 @@ public class Item extends AbstractEntity {
 	}
 
 	/**
-	 * Add a new description into the item object.
+	 * Remove a description from the item object.
 	 * 
 	 * @param description a new description which adds to the item object.
 	 */

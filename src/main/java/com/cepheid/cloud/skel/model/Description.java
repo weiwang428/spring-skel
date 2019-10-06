@@ -29,9 +29,8 @@ public class Description extends AbstractEntity {
 
 	// Json generate the name for getter/setter methods, we have to match the field
 	// name with the getter/setter methods.
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne
 	@JoinColumn(name = "Item_Id")
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JsonIgnore
 	private Item item;
 

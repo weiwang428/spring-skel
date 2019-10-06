@@ -3,7 +3,6 @@ package com.cepheid.cloud.skel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 
@@ -188,9 +187,9 @@ public class ItemControllerTest extends TestBase {
 		assertEquals(item_state, n_item.getState());
 		// Now check the descriptions of the n_item.
 		Collection<Description> descriptions = n_item.getDescriptions();
-		// This item should contain exactly 3 descriptions now, since we add one more
-		// into the list.
-		assertEquals(3, descriptions.size());
+		// This item should contain exactly 1 descriptions now, since this new item only
+		// contains one entry for the content.
+		assertEquals(1, descriptions.size());
 		// Find the 1st Description;
 		Description found_description = descriptions.stream().filter(dd -> dd.getContent().equals(content)).findAny()
 				.orElse(null);
@@ -233,10 +232,9 @@ public class ItemControllerTest extends TestBase {
 		// Now check the descriptions of the n_item.
 		Collection<Description> descriptions = n_item.getDescriptions();
 		System.out.println(descriptions.size());
-		// This item should contain at least 3 descriptions now, since we add one more
-		// into the list.
-		// the size can be different a little bit depends on when this test is run.
-		assertTrue(descriptions.size() >= 3);
+		// This item should contain exactly 1 description now, since the new added
+		// description list only has 1 entry
+		assertEquals(1, descriptions.size());
 		// Find the 1st Description;
 		Description found_description = descriptions.stream().filter(dd -> dd.getContent().equals(content)).findAny()
 				.orElse(null);
