@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cepheid.cloud.skel.exception.ResourceNotFoundException;
+import com.cepheid.cloud.skel.model.Description;
 import com.cepheid.cloud.skel.model.Item;
 import com.cepheid.cloud.skel.model.ItemState;
 import com.cepheid.cloud.skel.service.ItemService;
@@ -73,6 +74,7 @@ public class ItemController {
 	 * given format will be in application/json, it will generate an
 	 * ResourceNotFoundException if there is no item with the given id.
 	 * 
+	 * @param id The id of the searched item
 	 * @return A item object from the database with the given item id.
 	 * @exception ResourceNotFoundException
 	 */
@@ -92,6 +94,9 @@ public class ItemController {
 	 * server, the given format will be in application/json, it will generate an
 	 * ResourceNotFoundException if there is no item with the given name.
 	 * 
+	 * @param name  The name information of the searched item, can be null.
+	 * @param state The state information of the searched item, can be null, but if
+	 *              name is null at the same time, an exception will be thrown.
 	 * @return A collection of item objects from the database with the given item
 	 *         name.
 	 * @exception ResourceNotFoundException
@@ -113,6 +118,7 @@ public class ItemController {
 	 * has a ID which is already exist in the database, it will update the exiting
 	 * item instead.
 	 * 
+	 * @param item The new item which is going to be added.
 	 * @return The new added item object information from database.
 	 */
 	@POST
@@ -129,6 +135,8 @@ public class ItemController {
 	 * item information, the given format will be in application/json, it will
 	 * generate an ResourceNotFoundException if there is no item with the given id.
 	 * 
+	 * @param id   Id of the item to be deleted from the database.
+	 * @param item the updated item information.
 	 * @return The updated item object information from database.
 	 * @exception ResourceNotFoundException
 	 */
@@ -150,6 +158,7 @@ public class ItemController {
 	 * status 202 which shows the delete operation is OK, it will generate an
 	 * ResourceNotFoundException if there is no item with the given id.
 	 * 
+	 * @param id Id of the item to be deleted from the database.
 	 * @return HTTP status Status.ACCEPTED(code: 202), and a message shows the
 	 *         deletion is successful.
 	 * @exception ResourceNotFoundException
@@ -161,5 +170,85 @@ public class ItemController {
 			throw new ResourceNotFoundException("Item was not found with id: " + id);
 		// Return with HTTP status code Accepted.
 		return Response.status(Status.ACCEPTED).entity("Item deleted successfully!").build();
+	}
+
+	/**
+	 * Add a new description objects to a given item into the database server, the
+	 * uploaded description does not need to contain a id information, if it does,
+	 * it will be ignored. return the item object with new added information, the
+	 * given format will be in application/json.
+	 * 
+	 * @param id          Id of the item to be added.
+	 * @param description New description which is going to be added to the item.
+	 * @return The new added information of the item from database.
+	 * @exception ResourceNotFoundException
+	 */
+	@POST
+	@Path("/item/{id}/description")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addDescriptionToItem(@PathParam("id") Long id, Description description)
+			throws ResourceNotFoundException {
+		Item m_item = mItemService.addDescriptionToItem(id, description);
+		if (m_item == null)
+			throw new ResourceNotFoundException("Item was not found with id: " + id);
+		// Return the new added Item information, with HTTP status code Created.
+		return Response.status(Status.CREATED).entity(m_item).build();
+	}
+
+	/**
+	 * Update a description objects in a given item into the database server, the
+	 * uploaded description needs to contain a valid description id information, the
+	 * description id needs to be included in the item already, otherwise, the
+	 * update will fail. return the item object with new added information, the
+	 * given format will be in application/json.
+	 * 
+	 * @param id          The exiting item id which the description update needs to
+	 *                    operate on.
+	 * @param description The new description information, and it has to have a
+	 *                    valid description id information, and it needs to belong
+	 *                    to this item already.
+	 * @return The new updated information of the item from database.
+	 * @exception ResourceNotFoundException
+	 */
+	@PUT
+	@Path("/item/{id}/description")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response UpdateDescriptionInItem(@PathParam("id") Long id, Description description)
+			throws ResourceNotFoundException {
+		Item m_item = mItemService.updateDescriptionInItem(id, description);
+		if (m_item == null)
+			throw new ResourceNotFoundException(
+					"Either the Item id: " + id + " or the description id: " + description.getId() + " is invalid.");
+		// Return the new added Item information, with HTTP status code Created.
+		return Response.status(Status.ACCEPTED).entity(m_item).build();
+	}
+
+	/**
+	 * Delete an existing description object from the existing item in the database
+	 * server, return the HTTP status 202 which shows the delete operation is OK, it
+	 * will generate an ResourceNotFoundException if there is no item with the given
+	 * id or no valid descriptionId in the existing item object.
+	 * 
+	 * @param id            The exiting item id which the deletion intends to be
+	 *                      done on.
+	 * @param descriptionId The description id which should be valid and already in
+	 *                      the item object.
+	 * @return HTTP status Status.ACCEPTED(code: 202), and a message shows the
+	 *         deletion is successful.
+	 * @exception ResourceNotFoundException
+	 */
+	@DELETE
+	@Path("/item/{id}/description")
+	public Response deleteDescriptionFromItem(@PathParam("id") Long id, @QueryParam("descriptionId") Long descriptionId)
+			throws ResourceNotFoundException {
+		if (!mItemService.deleteDescriptionFromItem(id, descriptionId))
+			throw new ResourceNotFoundException(
+					"Either the Item id: " + id + " or the description id: " + descriptionId + " is invalid.");
+
+		// Return with HTTP status code Accepted.
+		return Response.status(Status.ACCEPTED).entity("Description has been successfully deleted from the item!")
+				.build();
 	}
 }

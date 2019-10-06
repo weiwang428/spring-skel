@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.cepheid.cloud.skel.model.Description;
 import com.cepheid.cloud.skel.model.Item;
 import com.cepheid.cloud.skel.model.ItemState;
 import com.cepheid.cloud.skel.repository.ItemRepository;
@@ -105,8 +106,7 @@ public class ItemService {
 			final var found_name_items = FindItemByName(name);
 			final var found_state_items = FindItemByState(state);
 			if (found_name_items != null && found_state_items != null) {
-				var final_list = found_state_items.stream()
-						.filter(found_name_items::contains)
+				var final_list = found_state_items.stream().filter(found_name_items::contains)
 						.collect(Collectors.toList());
 				if (final_list != null)
 					return final_list;
@@ -184,4 +184,76 @@ public class ItemService {
 		mItemRepository.delete(m_item);
 		return true;
 	}
+
+	/**
+	 * Add a new description to the existing item, the given description needs to be
+	 * a new description, the id information will be ignored.
+	 * 
+	 * @param id          The exiting item id which the new description will be
+	 *                    inserted into.
+	 * @param description New description which is going to be added to the existing
+	 *                    item.
+	 * @return The new updated item information.
+	 */
+	public Item addDescriptionToItem(Long id, Description description) {
+		Item m_item = mItemRepository.findById(id).orElse(null);
+		if (m_item == null)
+			return null;
+		// The id information will be ignored.
+		description.setId(null);
+		m_item.addDescription(description);
+		m_item = mItemRepository.save(m_item);
+		return m_item;
+	}
+
+	/**
+	 * Update a new description to the existing item, the given description needs to
+	 * have a valid description id information, and it has to belong to this item
+	 * already.
+	 * 
+	 * @param id          The exiting item id which the new description will be
+	 *                    inserted into.
+	 * @param description New description which is going to be updated in the
+	 *                    existing item, it needs to have a valid description id
+	 *                    which is already belong to this item.
+	 * @return The new updated item information.
+	 */
+	public Item updateDescriptionInItem(Long id, Description description) {
+		Item m_item = mItemRepository.findById(id).orElse(null);
+		if (m_item == null || description.getId() == null)
+			return null;
+		var old_d = m_item.getDescriptions().stream().filter(d -> d.getId() == description.getId()).findFirst()
+				.orElse(null);
+		if (old_d == null)
+			return null;
+		// Update the description information when all the information is valid.
+		old_d.setContent(description.getContent());
+		m_item = mItemRepository.save(m_item);
+		return m_item;
+	}
+
+	/**
+	 * Delete a description from the existing item, the given description needs to
+	 * have a valid description id information, and it has to belong to this item
+	 * already.
+	 * 
+	 * @param id            The exiting item id which the new description will be
+	 *                      inserted into.
+	 * @param descriptionId The description Id which intends to be deleted from the
+	 *                      item object.
+	 * @return true if the deletion is successful, otherwise, return false.
+	 */
+	public boolean deleteDescriptionFromItem(Long id, Long descriptionId) {
+		Item m_item = mItemRepository.findById(id).orElse(null);
+		if (m_item == null || descriptionId == null)
+			return false;
+		var old_d = m_item.getDescriptions().stream().filter(d -> d.getId() == descriptionId).findFirst().orElse(null);
+		if (old_d == null)
+			return false;
+		// Remove the description from the current item.
+		m_item.removeDescription(old_d);
+		m_item = mItemRepository.save(m_item);
+		return true;
+	}
+
 }

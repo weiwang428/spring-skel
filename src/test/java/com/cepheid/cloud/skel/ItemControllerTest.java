@@ -221,7 +221,7 @@ public class ItemControllerTest extends TestBase {
 
 		Builder itemController = getBuilder("/app/api/1.0/items");
 		Item return_item = itemController.post(Entity.json(item), Item.class);
-		System.out.println(return_item);
+//		System.out.println(return_item);
 
 		// Do the sanity check of the return item.
 		assertNotNull(return_item);
@@ -235,7 +235,7 @@ public class ItemControllerTest extends TestBase {
 		itemController = getBuilder("/app/api/1.0/items/item/" + item_id);
 
 		Item n_item = itemController.get(Item.class);
-		System.out.println(n_item);
+//		System.out.println(n_item);
 		assertNotNull(n_item);
 		assertEquals(item_name, n_item.getName());
 		assertEquals(item_state, n_item.getState());
@@ -265,7 +265,7 @@ public class ItemControllerTest extends TestBase {
 
 		Builder itemController = getBuilder("/app/api/1.0/items/item/" + item_id);
 		Item return_item = itemController.put(Entity.json(item), Item.class);
-		System.out.println(return_item);
+//		System.out.println(return_item);
 
 		// Do the sanity check of the return item.
 		assertNotNull(return_item);
@@ -279,13 +279,12 @@ public class ItemControllerTest extends TestBase {
 		itemController = getBuilder("/app/api/1.0/items/item/" + item_id);
 
 		Item n_item = itemController.get(Item.class);
-		System.out.println(n_item);
+//		System.out.println(n_item);
 		assertNotNull(n_item);
 		assertEquals(item_name, n_item.getName());
 		assertEquals(item_state, n_item.getState());
 		// Now check the descriptions of the n_item.
 		var descriptions = n_item.getDescriptions();
-		System.out.println(descriptions.size());
 		// This item should contain exactly 1 description now, since the new added
 		// description list only has 1 entry
 		assertEquals(1, descriptions.size());
@@ -333,7 +332,92 @@ public class ItemControllerTest extends TestBase {
 		final Long item_id = 100L;
 		Builder itemController = getBuilder("/app/api/1.0/items/item/" + item_id);
 		Response response = itemController.delete();
-		System.out.println(response.getStatus());
+		// Check the return status code with the response, we should get Internal server
+		// error code.
+		assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+	}
+
+	@Test
+	public void testAddNewDescriptionToItem() throws Exception {
+		final Long item_id = 1L;
+		final String content = "This is a completely new added description for item 1.";
+		Description d = new Description(content);
+		Builder itemController = getBuilder("/app/api/1.0/items/item/" + item_id + "/description");
+		Item return_item = itemController.post(Entity.json(d), Item.class);
+
+//		System.out.println(return_item);
+		// Check if the return_item has the added description.
+		var find_in_content = return_item.getDescriptions().stream().filter(dd -> dd.getContent().equals(content))
+				.findFirst().orElse(null);
+		assertNotNull(find_in_content);
+		assertNotNull(find_in_content.getId());
+	}
+	
+	@Test(expected = Exception.class)
+	public void testAddNewDescriptionToItemWithInvalidItemIdThrowException() throws Exception {
+		final Long item_id = 20L;
+		final String content = "This is a completely new added description for item 1.";
+		Description d = new Description(content);
+		Builder itemController = getBuilder("/app/api/1.0/items/item/" + item_id + "/description");
+		itemController.post(Entity.json(d), Item.class);
+	}
+	
+	@Test
+	public void testUpdateDescriptionInItem() throws Exception {
+		final Long item_id = 2L;
+		final String content = "This is a completely new content.";
+		final Long description_id = 3L;
+		Description d = new Description(content);
+		d.setId(description_id);
+		Builder itemController = getBuilder("/app/api/1.0/items/item/" + item_id + "/description");
+		Item return_item = itemController.put(Entity.json(d), Item.class);
+		
+		System.out.println(return_item);
+		// Check if the return_item has the added 
+		var find_in_content = return_item.getDescriptions().stream().filter(dd -> dd.getContent().equals(content))
+				.findFirst().orElse(null);
+		assertNotNull(find_in_content);
+	}
+	
+	@Test(expected = Exception.class)
+	public void testUpdateDescriptionInItemWithInvalidItemIdThrownException() throws Exception {
+		final Long item_id = 200L;
+		final String content = "This is a completely new content.";
+		final Long description_id = 3L;
+		Description d = new Description(content);
+		d.setId(description_id);
+		Builder itemController = getBuilder("/app/api/1.0/items/item/" + item_id + "/description");
+		itemController.put(Entity.json(d), Item.class);
+	}
+	
+	@Test(expected = Exception.class)
+	public void testUpdateDescriptionInItemWithInvalidDescriptionIdThrownException() throws Exception {
+		final Long item_id = 200L;
+		final String content = "This is a completely new content.";
+		Description d = new Description(content);
+		Builder itemController = getBuilder("/app/api/1.0/items/item/" + item_id + "/description");
+		itemController.put(Entity.json(d), Item.class);
+	}
+	
+	@Test
+	public void testDeleteDescriptionFromItem() throws Exception {
+		final Long item_id = 1L;
+		Properties queryParam = new Properties();
+		queryParam.setProperty("descriptionId", "1");
+		Builder itemController = getQueryBuilder("/app/api/1.0/items/item/" + item_id + "/description", queryParam);
+		Response response = itemController.delete();
+		// Check the return status code with the response.
+		assertEquals(Status.ACCEPTED.getStatusCode(), response.getStatus());
+	}
+	
+	@Test
+	public void testDeleteDescriptionFromItemWithNonExistingIdThenReturnInternalServerErrorCode() throws Exception {
+		final Long item_id = 10L;
+		Properties queryParam = new Properties();
+		queryParam.setProperty("descriptionId", "1");
+		Builder itemController = getQueryBuilder("/app/api/1.0/items/item/" + item_id + "/description", queryParam);
+		Response response = itemController.delete();
+//		System.out.println(response.getStatus());
 		// Check the return status code with the response, we should get Internal server
 		// error code.
 		assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
