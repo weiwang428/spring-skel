@@ -123,7 +123,16 @@ public class ItemController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addItem(Item item) {
-		Item m_item = mItemRepository.save(item);
+		Item m_item = mItemRepository.findById(item.getId()).orElse(null);
+		if (m_item == null) {
+			m_item = mItemRepository.save(item);
+		} else {
+//			var old_list = m_item.getDescriptions();
+			m_item.setName(item.getName());
+			m_item.setState(item.getState());
+			m_item.setDescriptions(item.getDescriptions());
+			m_item = mItemRepository.save(m_item);
+		}
 //		mDescriptionRepository.findAll().forEach(System.out::println);
 		// Return the new added Item information, with HTTP status code Created.
 		return Response.status(Status.CREATED).entity(m_item).build();
@@ -145,9 +154,16 @@ public class ItemController {
 		Item m_item = mItemRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Item was not found with id: " + id));
 		// Now, we should update the field information for the updated one.
+		var old_list = m_item.getDescriptions();
+//		var all_new_description = old_list.stream().filter(d -> d.getId() == null);
+//		var all_old_description = old_list.stream().filter(d -> d.getId() != null);
 		m_item.setName(item.getName());
 		m_item.setState(item.getState());
-		m_item.setDescriptions(item.getDescriptions());
+		item.getDescriptions().stream().filter(d -> d.getId() == null).forEach(m_item::addDescription);
+		m_item = mItemRepository.save(m_item);
+		item.getDescriptions().stream().filter(d -> d.getId() != null).forEach(m_item::addDescription);
+		m_item = mItemRepository.save(m_item);
+		old_list.stream().forEach(m_item::removeDescription);
 		m_item = mItemRepository.save(m_item);
 		// Return the update Item information, with HTTP status code Accepted.
 		return Response.status(Status.ACCEPTED).entity(m_item).build();

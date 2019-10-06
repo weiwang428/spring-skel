@@ -30,6 +30,7 @@ public class Item extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	private ItemState mState;
 
+//	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@Column(name = "Descriptions")
 	private List<Description> mDescriptions;
@@ -61,8 +62,7 @@ public class Item extends AbstractEntity {
 	 * @param state State of the item object.
 	 */
 	public Item(String name, ItemState state) {
-		this();
-		setName(name);
+		this(name);
 		setState(state);
 	}
 
@@ -112,23 +112,38 @@ public class Item extends AbstractEntity {
 	}
 
 	/**
-	 * Add a new description into the item object.
-	 * 
-	 * @param description a new description which adds to the item object.
-	 */
-	public void addDescription(Description description) {
-		this.getDescriptions().add(description);
-		description.setItem(this);
-	}
-
-	/**
 	 * Setter
 	 * 
 	 * @param descriptions New description list of the item object.
 	 */
 	public void setDescriptions(List<Description> descriptions) {
 		getDescriptions().clear();
-		descriptions.forEach(d -> addDescription(d));
+		if (descriptions != null)
+			descriptions.forEach(d -> addDescription(d));
+	}
+
+	/**
+	 * Add a new description into the item object.
+	 * 
+	 * @param description a new description which adds to the item object.
+	 */
+	public void addDescription(Description description) {
+		if (description != null) {
+			this.getDescriptions().add(description);
+			description.setItem(this);
+		}
+	}
+	
+	/**
+	 * Add a new description into the item object.
+	 * 
+	 * @param description a new description which adds to the item object.
+	 */
+	public void removeDescription(Description description) {
+		if (description != null) {
+			this.getDescriptions().remove(description);
+			description.setItem(null);
+		}
 	}
 
 	@Override

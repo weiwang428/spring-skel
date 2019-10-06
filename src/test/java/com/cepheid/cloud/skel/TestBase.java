@@ -10,8 +10,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.glassfish.jersey.media.multipart.MultiPartFeature;

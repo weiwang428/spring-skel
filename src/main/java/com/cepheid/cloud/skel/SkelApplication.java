@@ -28,14 +28,11 @@ public class SkelApplication {
 			Stream.of("Lord of the rings", "Hobbit", "Silmarillion", "Unfinished Tales and The History of Middle-earth")
 					.forEach(name -> {
 						// Create a new item to hold the initial data information.
-						Item item = new Item();
-						item.setName(name);
-						item.setState(ItemState.VALID);
+						Item item = new Item(name, ItemState.VALID);
 						// Add the description list to the new created item.
 						Stream.of("This is just a test content", "This is just another test content")
 								.forEach(content -> {
-									Description d = new Description();
-									d.setContent(content);
+									Description d = new Description(content);
 									item.addDescription(d);
 								});
 						// Save the new created item.

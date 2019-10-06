@@ -58,7 +58,7 @@ public class Description extends AbstractEntity {
 	 * @param item    item which owns the description object.
 	 */
 	public Description(String content, Item item) {
-		mContent = content;
+		this(content);
 		this.item = item;
 	}
 

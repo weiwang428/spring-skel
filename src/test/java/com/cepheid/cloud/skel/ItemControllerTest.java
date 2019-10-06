@@ -120,11 +120,8 @@ public class ItemControllerTest extends TestBase {
 		final String content = "This is a completely new content.";
 		final String item_name = "New Name";
 		final ItemState item_state = ItemState.VALID;
-		Description d = new Description();
-		d.setContent(content);
-		Item item = new Item();
-		item.setName(item_name);
-		item.setState(item_state);
+		Description d = new Description(content);
+		Item item = new Item(item_name, item_state);
 		item.addDescription(d);
 
 		Builder itemController = getBuilder("/app/api/1.0/items");
@@ -164,11 +161,8 @@ public class ItemControllerTest extends TestBase {
 		final Long item_id = 1L;
 		final String item_name = "New Name";
 		final ItemState item_state = ItemState.VALID;
-		Description d = new Description();
-		d.setContent(content);
-		Item item = new Item();
-		item.setName(item_name);
-		item.setState(item_state);
+		Description d = new Description(content);
+		Item item = new Item(item_name, item_state);
 		item.setId(item_id);
 		item.addDescription(d);
 
@@ -212,11 +206,8 @@ public class ItemControllerTest extends TestBase {
 		final Long item_id = 1L;
 		final String item_name = "New Name";
 		final ItemState item_state = ItemState.VALID;
-		Description d = new Description();
-		d.setContent(content);
-		Item item = new Item();
-		item.setName(item_name);
-		item.setState(item_state);
+		Description d = new Description(content);
+		Item item = new Item(item_name, item_state);
 		item.addDescription(d);
 
 		Builder itemController = getBuilder("/app/api/1.0/items/item/" + item_id);
@@ -260,11 +251,8 @@ public class ItemControllerTest extends TestBase {
 		final Long item_id = 20L;
 		final String item_name = "New Name";
 		final ItemState item_state = ItemState.INVALID;
-		Description d = new Description();
-		d.setContent(content);
-		Item item = new Item();
-		item.setName(item_name);
-		item.setState(item_state);
+		Description d = new Description(content);
+		Item item = new Item(item_name, item_state);
 		item.addDescription(d);
 
 		Builder itemController = getBuilder("/app/api/1.0/items/item/" + item_id);
