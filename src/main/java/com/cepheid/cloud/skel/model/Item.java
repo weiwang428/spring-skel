@@ -30,7 +30,6 @@ public class Item extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	private ItemState mState;
 
-//	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@Column(name = "Descriptions")
 	private List<Description> mDescriptions;
@@ -133,7 +132,7 @@ public class Item extends AbstractEntity {
 			description.setItem(this);
 		}
 	}
-	
+
 	/**
 	 * Add a new description into the item object.
 	 * 

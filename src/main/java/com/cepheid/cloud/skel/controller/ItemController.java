@@ -22,8 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cepheid.cloud.skel.exception.ResourceNotFoundException;
 import com.cepheid.cloud.skel.model.Item;
-import com.cepheid.cloud.skel.repository.DescriptionRepository;
 import com.cepheid.cloud.skel.repository.ItemRepository;
+import com.cepheid.cloud.skel.service.ItemService;
 
 import io.swagger.annotations.Api;
 
@@ -41,21 +41,17 @@ import io.swagger.annotations.Api;
 @Api()
 public class ItemController {
 
-	private final ItemRepository mItemRepository;
-	private final DescriptionRepository mDescriptionRepository;
+	private final ItemService mItemService;
 
 	/**
 	 * Constructor for class ItemController with provided services.
 	 * 
-	 * @param itemRepository        ItemRepository object to manipulate the item
-	 *                              objects.
-	 * @param descriptionRepository DescriptionRepository object to manipulate the
-	 *                              description objects.
+	 * @param ItemService ItemService which provides a number of useful service to
+	 *                    manipulate the item objects.
 	 */
 	@Autowired
-	public ItemController(ItemRepository itemRepository, DescriptionRepository descriptionRepository) {
-		mItemRepository = itemRepository;
-		mDescriptionRepository = descriptionRepository;
+	public ItemController(ItemService itemService) {
+		mItemService = itemService;
 	}
 
 	/**
@@ -68,10 +64,8 @@ public class ItemController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Response getItems() {
-		Collection<Item> found_items = mItemRepository.findAll();
-//		found_items.forEach(System.out::println);
-//		mDescriptionRepository.findAll().forEach(System.out::println);
-		return Response.status(Status.OK).entity(found_items).build();
+		Collection<Item> all_item_list = mItemService.FetchAllItemList();
+		return Response.status(Status.OK).entity(all_item_list).build();
 	}
 
 	/**
@@ -86,8 +80,9 @@ public class ItemController {
 	@Path("/item/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getItem(@PathParam(value = "id") Long id) throws ResourceNotFoundException {
-		Item item = mItemRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Item was not found with id: " + id));
+		Item item = mItemService.FindItemById(id);
+		if (item == null)
+			throw new ResourceNotFoundException("Item was not found with id: " + id);
 		// Return the find Item information, with HTTP status code OK.
 		return Response.status(Status.OK).entity(item).build();
 	}
@@ -105,8 +100,9 @@ public class ItemController {
 	@Path("/item")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getItem(@QueryParam("name") String name) throws ResourceNotFoundException {
-		Collection<Item> found_items = mItemRepository.findAllBymName(name)
-				.orElseThrow(() -> new ResourceNotFoundException("Item was not found with name: " + name));
+		var found_items = mItemService.FindItemByName(name);
+		if (found_items == null)
+			throw new ResourceNotFoundException("Item was not found with name: " + name);
 		// Return the find Item information, with HTTP status code OK.
 		return Response.status(Status.OK).entity(found_items).build();
 	}
@@ -123,17 +119,7 @@ public class ItemController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addItem(Item item) {
-		Item m_item = mItemRepository.findById(item.getId()).orElse(null);
-		if (m_item == null) {
-			m_item = mItemRepository.save(item);
-		} else {
-//			var old_list = m_item.getDescriptions();
-			m_item.setName(item.getName());
-			m_item.setState(item.getState());
-			m_item.setDescriptions(item.getDescriptions());
-			m_item = mItemRepository.save(m_item);
-		}
-//		mDescriptionRepository.findAll().forEach(System.out::println);
+		Item m_item = mItemService.AddItem(item);
 		// Return the new added Item information, with HTTP status code Created.
 		return Response.status(Status.CREATED).entity(m_item).build();
 	}
@@ -151,20 +137,10 @@ public class ItemController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateItem(@PathParam("id") Long id, Item item) throws ResourceNotFoundException {
-		Item m_item = mItemRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Item was not found with id: " + id));
-		// Now, we should update the field information for the updated one.
-		var old_list = m_item.getDescriptions();
-//		var all_new_description = old_list.stream().filter(d -> d.getId() == null);
-//		var all_old_description = old_list.stream().filter(d -> d.getId() != null);
-		m_item.setName(item.getName());
-		m_item.setState(item.getState());
-		item.getDescriptions().stream().filter(d -> d.getId() == null).forEach(m_item::addDescription);
-		m_item = mItemRepository.save(m_item);
-		item.getDescriptions().stream().filter(d -> d.getId() != null).forEach(m_item::addDescription);
-		m_item = mItemRepository.save(m_item);
-		old_list.stream().forEach(m_item::removeDescription);
-		m_item = mItemRepository.save(m_item);
+		item.setId(id);
+		Item m_item = mItemService.UpdateItem(item);
+		if (m_item == null)
+			throw new ResourceNotFoundException("Item was not found with id: " + id);
 		// Return the update Item information, with HTTP status code Accepted.
 		return Response.status(Status.ACCEPTED).entity(m_item).build();
 	}
@@ -181,10 +157,8 @@ public class ItemController {
 	@DELETE
 	@Path("/item/{id}")
 	public Response deleteItem(@PathParam("id") Long id) throws ResourceNotFoundException {
-		Item m_item = mItemRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Item was not found with id: " + id));
-		// Now, we should remove the find item.
-		mItemRepository.delete(m_item);
+		if (!mItemService.DeleteItem(id))
+			throw new ResourceNotFoundException("Item was not found with id: " + id);
 		// Return with HTTP status code Accepted.
 		return Response.status(Status.ACCEPTED).entity("Item deleted successfully!").build();
 	}
