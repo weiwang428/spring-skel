@@ -116,7 +116,7 @@ public class Item extends AbstractEntity {
 	 * @param descriptions New description list of the item object.
 	 */
 	public void setDescriptions(List<Description> descriptions) {
-		getDescriptions().clear();
+		mDescriptions.clear();
 		if (descriptions != null)
 			descriptions.forEach(d -> addDescription(d));
 	}
@@ -128,7 +128,7 @@ public class Item extends AbstractEntity {
 	 */
 	public void addDescription(Description description) {
 		if (description != null) {
-			this.getDescriptions().add(description);
+			mDescriptions.add(description);
 			description.setItem(this);
 		}
 	}
@@ -140,7 +140,7 @@ public class Item extends AbstractEntity {
 	 */
 	public void removeDescription(Description description) {
 		if (description != null) {
-			this.getDescriptions().remove(description);
+			mDescriptions.remove(description);
 			description.setItem(null);
 		}
 	}

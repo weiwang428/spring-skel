@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.cepheid.cloud.skel.model.Item;
+import com.cepheid.cloud.skel.model.ItemState;
 
 /***
  * This is a ItemRepository class which extends from JpaRepository, and provides
@@ -22,4 +23,12 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 	 * @return A collection of Item objects which has the given search name.
 	 */
 	Optional<List<Item>> findAllBymName(String mName);
+	
+	/**
+	 * Find all the Items with the given ItemState.
+	 * 
+	 * @param mState State of the item object to search.
+	 * @return A collection of Item objects which has the given item state.
+	 */
+	Optional<List<Item>> findAllBymState(ItemState mState);
 }

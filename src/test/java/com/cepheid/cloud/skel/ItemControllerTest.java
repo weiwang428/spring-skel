@@ -28,7 +28,7 @@ public class ItemControllerTest extends TestBase {
 	public void testGetItems() throws Exception {
 		Builder itemController = getBuilder("/app/api/1.0/items");
 
-		Collection<Item> items = itemController.get(new GenericType<Collection<Item>>() {
+		var items = itemController.get(new GenericType<Collection<Item>>() {
 		});
 
 		// We should only have exactly 4 entries.
@@ -59,7 +59,7 @@ public class ItemControllerTest extends TestBase {
 		assertEquals("Hobbit", item.getName());
 		assertEquals(ItemState.VALID, item.getState());
 		// Now check the descriptions of the item.
-		Collection<Description> descriptions = item.getDescriptions();
+		var descriptions = item.getDescriptions();
 		// This item should contain exactly 2 descriptions.
 		assertEquals(2, descriptions.size());
 		// Find the 1st Description;
@@ -82,7 +82,7 @@ public class ItemControllerTest extends TestBase {
 		queryParam.setProperty("name", "Silmarillion");
 		Builder itemController = getQueryBuilder("/app/api/1.0/items/item", queryParam);
 
-		Collection<Item> items = itemController.get(new GenericType<Collection<Item>>() {
+		var items = itemController.get(new GenericType<Collection<Item>>() {
 		});
 		assertNotNull(items);
 
@@ -93,7 +93,7 @@ public class ItemControllerTest extends TestBase {
 		assertEquals("Silmarillion", item.getName());
 		assertEquals(ItemState.VALID, item.getState());
 		// Now check the descriptions of the item.
-		Collection<Description> descriptions = item.getDescriptions();
+		var descriptions = item.getDescriptions();
 		// This item should contain exactly 2 descriptions.
 		assertEquals(2, descriptions.size());
 		// Find the 1st Description;
@@ -110,6 +110,60 @@ public class ItemControllerTest extends TestBase {
 
 		// We should Expect an exception throw here since the API should return an
 		// exception.
+		itemController.get(new GenericType<Collection<Item>>() {
+		});
+	}
+
+	@Test
+	public void testGetItemByState() throws Exception {
+		Properties queryParam = new Properties();
+		queryParam.setProperty("state", "VALID");
+		Builder itemController = getQueryBuilder("/app/api/1.0/items/item", queryParam);
+
+		var items = itemController.get(new GenericType<Collection<Item>>() {
+		});
+		assertNotNull(items);
+
+		// We should only have exactly 4 entry match the case.
+		assertEquals(4, items.size());
+	}
+
+	@Test(expected = Exception.class)
+	public void testGetItemByNonExistStateThenThrowExceptions() throws Exception {
+		Properties queryParam = new Properties();
+		queryParam.setProperty("state", "INVALID");
+		Builder itemController = getQueryBuilder("/app/api/1.0/items/item", queryParam);
+
+		itemController.get(new GenericType<Collection<Item>>() {
+		});
+	}
+
+	@Test
+	public void testGetItemByNameAndState() throws Exception {
+		Properties queryParam = new Properties();
+		queryParam.setProperty("name", "Hobbit");
+		queryParam.setProperty("state", "VALID");
+		Builder itemController = getQueryBuilder("/app/api/1.0/items/item", queryParam);
+
+		var items = itemController.get(new GenericType<Collection<Item>>() {
+		});
+		assertNotNull(items);
+		// We should only have exactly 1 entry match the case.
+		assertEquals(1, items.size());
+
+		Item item = items.stream().findFirst().orElse(null);
+		assertNotNull(item);
+		assertEquals("Hobbit", item.getName());
+		assertEquals(ItemState.VALID, item.getState());
+	}
+
+	@Test(expected = Exception.class)
+	public void testGetItemByNameAndStateWithNoMatchCauseException() throws Exception {
+		Properties queryParam = new Properties();
+		queryParam.setProperty("name", "Hobbit");
+		queryParam.setProperty("state", "INVALID");
+		Builder itemController = getQueryBuilder("/app/api/1.0/items/item", queryParam);
+
 		itemController.get(new GenericType<Collection<Item>>() {
 		});
 	}
@@ -143,7 +197,7 @@ public class ItemControllerTest extends TestBase {
 		assertEquals(item_name, n_item.getName());
 		assertEquals(item_state, n_item.getState());
 		// Now check the descriptions of the n_item.
-		Collection<Description> descriptions = n_item.getDescriptions();
+		var descriptions = n_item.getDescriptions();
 		// This item should contain exactly 1 descriptions, since this is what we
 		// create.
 		assertEquals(1, descriptions.size());
@@ -186,7 +240,7 @@ public class ItemControllerTest extends TestBase {
 		assertEquals(item_name, n_item.getName());
 		assertEquals(item_state, n_item.getState());
 		// Now check the descriptions of the n_item.
-		Collection<Description> descriptions = n_item.getDescriptions();
+		var descriptions = n_item.getDescriptions();
 		// This item should contain exactly 1 descriptions now, since this new item only
 		// contains one entry for the content.
 		assertEquals(1, descriptions.size());
@@ -230,7 +284,7 @@ public class ItemControllerTest extends TestBase {
 		assertEquals(item_name, n_item.getName());
 		assertEquals(item_state, n_item.getState());
 		// Now check the descriptions of the n_item.
-		Collection<Description> descriptions = n_item.getDescriptions();
+		var descriptions = n_item.getDescriptions();
 		System.out.println(descriptions.size());
 		// This item should contain exactly 1 description now, since the new added
 		// description list only has 1 entry
@@ -267,7 +321,7 @@ public class ItemControllerTest extends TestBase {
 
 		// Read all the items from the database again.
 		itemController = getBuilder("/app/api/1.0/items");
-		Collection<Item> items = itemController.get(new GenericType<Collection<Item>>() {
+		var items = itemController.get(new GenericType<Collection<Item>>() {
 		});
 		// Try to find this item again, it should be null in this case.
 		Item find_item = items.stream().filter(it -> it.getId() == item_id).findFirst().orElse(null);

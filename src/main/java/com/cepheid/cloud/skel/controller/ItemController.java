@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cepheid.cloud.skel.exception.ResourceNotFoundException;
 import com.cepheid.cloud.skel.model.Item;
-import com.cepheid.cloud.skel.repository.ItemRepository;
+import com.cepheid.cloud.skel.model.ItemState;
 import com.cepheid.cloud.skel.service.ItemService;
 
 import io.swagger.annotations.Api;
@@ -99,12 +99,12 @@ public class ItemController {
 	@GET
 	@Path("/item")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getItem(@QueryParam("name") String name) throws ResourceNotFoundException {
-		var found_items = mItemService.FindItemByName(name);
-		if (found_items == null)
-			throw new ResourceNotFoundException("Item was not found with name: " + name);
-		// Return the find Item information, with HTTP status code OK.
-		return Response.status(Status.OK).entity(found_items).build();
+	public Response getItem(@QueryParam("name") String name, @QueryParam("state") ItemState state)
+			throws ResourceNotFoundException {
+		var found_list = mItemService.FindItemByNameAndState(name, state);
+		if (found_list == null)
+			throw new ResourceNotFoundException("Item was not found with given information");
+		return Response.status(Status.OK).entity(found_list).build();
 	}
 
 	/**
